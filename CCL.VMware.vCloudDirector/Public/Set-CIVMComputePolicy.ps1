@@ -97,14 +97,12 @@ Function Set-CIVMComputePolicy {
 
             #Update the Compute Policy for the VM (use Invoke-WebRequest because the error messages are more descriptive).
             Write-Verbose -Message "Updating vDC Compute Policy on '$($vm.Name)' from '$($vm.ExtensionData.VdcComputePolicy.Name)' to $($ComputePolicy.name)."
-            $vCloudOperation = Invoke-WebRequest -Headers $headers -Method POST -Uri $reconfigureVmLink.Href -Body $vCloudVM.Vm -ContentType $reconfigureVmLink.Type -ErrorAction Stop
+            $vCloudTask = Invoke-vCloudDirectorWebRequest -Headers $headers -Method POST -Uri $reconfigureVmLink.Href -Body $vCloudVM.Vm -ContentType $reconfigureVmLink.Type
 
-            #Wait for the operation to complete.
-            $vCloudTask = [xml]($vCloudOperation.Content)
             $count = 1
             Do {
                 Write-Progress -Activity "Updating VM Compute Policy" -CurrentOperation $vm.Name -PercentComplete (Get-Percentage -Count $count -Total 20)
-                $vCloudTaskStatus = Invoke-RestMethod -Headers $headers -Method Get -Uri $vCloudTask.Task.href -ErrorAction Stop -Verbose:$false
+                $vCloudTaskStatus = Invoke-vCloudDirectorWebRequest -Headers $headers -Method Get -Uri $vCloudTask.Task.href -Verbose:$false
                 Start-Sleep -Seconds 6
                 $count++
 

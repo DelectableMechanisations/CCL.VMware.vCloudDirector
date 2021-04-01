@@ -7,7 +7,7 @@
         Note: You must have the 'VMware.VimAutomation.Cloud' module installed and be connected to a vCloud Director organisation before running this command.
 
     .PARAMETER Path
-        The path to the ISO media file that to upload to a vCloud Directory catalog. This must have a '.iso' file extension and be a valid path.
+        The path to the ISO media file that to upload to a vCloud Directory catalog. This must have the extension '.iso' and be a valid path.
 
     .PARAMETER CatalogName
         The name of the vCloud Director catalog that will store the ISO media file. This must be a valid vCloud Director catalog name.
@@ -18,13 +18,22 @@
     .EXAMPLE
         Add-CIMediaIso -Path 'C:\Temp\Windows2016Installer.iso' -CatalogName 'Christchurch Generic Catalog' -Description 'Official installation media for Windows Server 2016'
 
-        Uploads the 'C:\Temp\Windows2016Installer.iso' ISO media file to the vCloud Director catalog 'Christchurch Generic Catalog' and adds a description.
+        Uploads the 'C:\Temp\Windows2016Installer.iso' ISO media file to the vCloud Director catalog 'Christchurch Generic Catalog'.
 
     .EXAMPLE
         Connect-CIServer -Server vcloud.mycompany.co.nz -Org corp -Credential (Get-Credential)
         Add-CIMediaIso -Path 'C:\Temp\Windows2016Installer.iso' -CatalogName 'Christchurch Generic Catalog' -Description 'Official installation media for Windows Server 2016'
 
         Uploads the 'C:\Temp\Windows2016Installer.iso' ISO media file to the vCloud Director catalog 'Christchurch Generic Catalog'.
+
+    .EXAMPLE
+        oscdimg.exe -m -h -u1 -udfver102 "C:\Temp\IsoFileFolder" "C:\Temp\IsoFile.iso"
+        Add-CIMediaIso -Path 'C:\Temp\IsoFile.iso' -CatalogName 'Christchurch Generic Catalog'
+
+        Converts the "C:\Temp\IsoFileFolder" folder into the ISO file "C:\Temp\IsoFile.iso" then uploads this to the vCloud Director catalog 'Christchurch Generic Catalog'.
+        Note: ocsdimg.exe is a Microsoft command line tool part of Windows ADK for Windows 10 and can be downloaded from Microsoft's website.
+        After installing the ADK, the executable can be found here and can be copied to any location:
+        C:\Program Files (x86)\Windows Kits\10\Assessment and Deployment Kit\Deployment Tools\amd64\Oscdimg\oscdimg.exe
 
     .NOTES
         Developed with help from the following documentation:
@@ -83,18 +92,14 @@ Function Add-CIMediaIso {
         #2 POST an action/upload request to the URL.
         #The server uses this information to create a CatalogItem and corresponding Media object, then returns the CatalogItem in its response.
         Write-Verbose -Message "Creating a CatalogItem and corresponding Media object in '$($catalogAddUrl.Href)'."
-        $response = Invoke-WebRequest -Uri $catalogAddUrl.Href -Headers $headers -Method 'Post' -Body $mediaXml -ContentType 'application/vnd.vmware.vcloud.media+xml' -UseBasicParsing -Verbose:$VerbosePreference
-        [Xml]$responseXml = $response.Content
+        $catalogItem = Invoke-vCloudDirectorWebRequest -Uri $catalogAddUrl.Href -Headers $headers -Method Post -Body $mediaXml -ContentType 'application/vnd.vmware.vcloud.media+xml'
 
         #3 Use the URL in the Entity element of the CatalogItem to retrieve the Media object.
-        $response = Invoke-WebRequest -Uri $responseXml.CatalogItem.Entity.href -Headers $headers -Method 'Get' -UseBasicParsing -Verbose:$VerbosePreference
-        [Xml]$responseXml = $response.Content
+        $catalogItemMediaObject = Invoke-vCloudDirectorWebRequest -Uri $catalogItem.CatalogItem.Entity.href -Headers $headers -Method Get
 
         #4 PUT the media file contents to the upload:default link in the response.
-        Write-Verbose -Message "Uploading '$($file.FullName)' to '$($responseXml.Media.Files.File.Link.href)'."
+        Write-Verbose -Message "Uploading '$($file.FullName)' to '$($catalogItemMediaObject.Media.Files.File.Link.href)'."
         $headers['Content-length'] = $file.Length
-        $response = Invoke-WebRequest -Uri $responseXml.Media.Files.File.Link.href -Headers $headers -Method 'Put' -InFile $file.FullName -UseBasicParsing -Verbose:$VerbosePreference
+        $null = Invoke-vCloudDirectorWebRequest -Uri $catalogItemMediaObject.Media.Files.File.Link.href -Headers $headers -Method 'Put' -InFile $file.FullName
     }
-
-    End {}
 }

@@ -44,7 +44,7 @@ Function Get-CIVMComputePolicy {
     Process {
         foreach ($vm in $CIVM) {
             #Retrieve the vCloud representation of the VM.
-            $vCloudVM = Invoke-RestMethod -Headers $headers -Method Get -Uri $vm.Href
+            $vCloudVM = Invoke-vCloudDirectorWebRequest -Headers $headers -Method Get -Uri $vm.Href
 
             #Output the Compute Policy currently applied to the VM.
             $vCloudVM.Vm.VdcComputePolicy | Select-Object -Property @(

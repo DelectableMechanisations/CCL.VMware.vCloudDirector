@@ -52,7 +52,7 @@ Function Get-OrgVdcComputePolicy {
             $vdcComputePolicyReferencesLink = $vdc.ExtensionData.Link | Where-Object {$_.Type -eq 'application/vnd.vmware.vcloud.vdcComputePolicyReferences+xml'}
 
             #Retrieve the Compute Policies.
-            $computePolicies = Invoke-RestMethod -Headers $headers -Method Get -Uri $vdcComputePolicyReferencesLink.href
+            $computePolicies = Invoke-vCloudDirectorWebRequest -Headers $headers -Method Get -Uri $vdcComputePolicyReferencesLink.href
 
             #Output all Compute Policies.
             $computePolicies.VdcComputePolicyReferences.VdcComputePolicyReference | Select-Object -Property @(

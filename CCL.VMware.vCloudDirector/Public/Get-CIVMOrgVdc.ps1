@@ -47,7 +47,7 @@ Function Get-CIVMOrgVdc {
         foreach ($vm in $CIVM) {
             #Retrieve the vCloud representation of the vDC by finding its link in the parent vApp.
             $orgVdcLink = $vm.VApp.ExtensionData.Link | Where-Object {$_.type -eq 'application/vnd.vmware.vcloud.vDC+xml'}
-            $vCloudOrgVdc = Invoke-RestMethod -Headers $headers -Method Get -Uri $orgVdcLink.Href
+            $vCloudOrgVdc = Invoke-vCloudDirectorWebRequest -Headers $headers -Method Get -Uri $orgVdcLink.Href
 
             #Output the vDC currently applied to the VM.
             $vCloudOrgVdc.Vdc | Select-Object -Property @(

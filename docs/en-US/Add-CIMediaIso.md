@@ -27,7 +27,7 @@ Note: You must have the 'VMware.VimAutomation.Cloud' module installed and be con
 Add-CIMediaIso -Path 'C:\Temp\Windows2016Installer.iso' -CatalogName 'Christchurch Generic Catalog' -Description 'Official installation media for Windows Server 2016'
 ```
 
-Uploads the 'C:\Temp\Windows2016Installer.iso' ISO media file to the vCloud Director catalog 'Christchurch Generic Catalog' and adds a description.
+Uploads the 'C:\Temp\Windows2016Installer.iso' ISO media file to the vCloud Director catalog 'Christchurch Generic Catalog'.
 
 ### EXAMPLE 2
 ```
@@ -37,11 +37,22 @@ Add-CIMediaIso -Path 'C:\Temp\Windows2016Installer.iso' -CatalogName 'Christchur
 
 Uploads the 'C:\Temp\Windows2016Installer.iso' ISO media file to the vCloud Director catalog 'Christchurch Generic Catalog'.
 
+### EXAMPLE 3
+```
+oscdimg.exe -m -h -u1 -udfver102 "C:\Temp\IsoFileFolder" "C:\Temp\IsoFile.iso"
+Add-CIMediaIso -Path 'C:\Temp\IsoFile.iso' -CatalogName 'Christchurch Generic Catalog'
+```
+
+Converts the "C:\Temp\IsoFileFolder" folder into the ISO file "C:\Temp\IsoFile.iso" then uploads this to the vCloud Director catalog 'Christchurch Generic Catalog'.
+Note: ocsdimg.exe is a Microsoft command line tool part of Windows ADK for Windows 10 and can be downloaded from Microsoft's website.
+After installing the ADK, the executable can be found here and can be copied to any location:
+C:\Program Files (x86)\Windows Kits\10\Assessment and Deployment Kit\Deployment Tools\amd64\Oscdimg\oscdimg.exe
+
 ## PARAMETERS
 
 ### -Path
 The path to the ISO media file that to upload to a vCloud Directory catalog.
-This must have a '.iso' file extension and be a valid path.
+This must have the extension '.iso' and be a valid path.
 
 ```yaml
 Type: String
