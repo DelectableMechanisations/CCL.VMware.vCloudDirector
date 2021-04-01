@@ -31,7 +31,7 @@
 Function Get-CIVMSnapshot {
     [CmdletBinding()]
     Param (
-        [Parameter(Mandatory, Position = 0, ValueFromPipeline = $True, ValueFromPipelinebyPropertyName=$True)]
+        [Parameter(Mandatory, Position = 0, ValueFromPipeline = $True)]
         [System.Object[]]
         $CIVM
     )

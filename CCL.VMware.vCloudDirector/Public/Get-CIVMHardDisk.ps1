@@ -32,7 +32,7 @@
 Function Get-CIVMHardDisk {
     [CmdletBinding()]
     Param (
-        [Parameter(Mandatory = $True, Position = 0, ValueFromPipeline = $True)]
+        [Parameter(Mandatory, Position = 0, ValueFromPipeline = $True)]
         [System.Object[]]
         $CIVM
     )

@@ -33,12 +33,12 @@
 Function Add-CIMediaIso {
     [CmdletBinding()]
     Param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [ValidateScript({(Test-Path -Path $_) -and ($_ -like '*.iso')})]
         [System.String]
         $Path,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [ValidateScript({(Get-Catalog -Name $_).Count -eq 1})]
         [System.String]
         $CatalogName,
