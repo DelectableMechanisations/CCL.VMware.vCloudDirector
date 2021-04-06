@@ -20,6 +20,3 @@ Function Get-vCloudDirectorLogonHeaders {
 
     Write-Output -InputObject $headers
 }
-
-
-
