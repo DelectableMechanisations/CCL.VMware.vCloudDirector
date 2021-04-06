@@ -84,7 +84,7 @@ Function Set-CIVMComputePolicy {
     Process {
         foreach ($vm in $CIVM) {
             #Retrieve the vCloud representation of the VM.
-            $vCloudVM = Invoke-RestMethod -Headers $headers -Method Get -Uri $vm.Href
+            $vCloudVM = Invoke-vCloudDirectorWebRequest -Headers $headers -Method Get -Uri $vm.Href
 
             #Update the VdcComputePolicy to reference the new compute policy.
             $vCloudVM.Vm.VdcComputePolicy.href = $ComputePolicy.href
@@ -95,22 +95,12 @@ Function Set-CIVMComputePolicy {
             #Retrieve the URL used to make the change
             $reconfigureVmLink = $vm.ExtensionData.Link | Where-Object {$_.Rel -eq 'reconfigureVm'}
 
-            #Update the Compute Policy for the VM (use Invoke-WebRequest because the error messages are more descriptive).
+            #Update the Compute Policy for the VM.
             Write-Verbose -Message "Updating vDC Compute Policy on '$($vm.Name)' from '$($vm.ExtensionData.VdcComputePolicy.Name)' to $($ComputePolicy.name)."
-            $vCloudTask = Invoke-vCloudDirectorWebRequest -Headers $headers -Method POST -Uri $reconfigureVmLink.Href -Body $vCloudVM.Vm -ContentType $reconfigureVmLink.Type
+            $vCloudTask = Invoke-vCloudDirectorWebRequest -Headers $headers -Method Post -Uri $reconfigureVmLink.Href -Body $vCloudVM.Vm -ContentType $reconfigureVmLink.Type
 
-            $count = 1
-            Do {
-                Write-Progress -Activity "Updating VM Compute Policy" -CurrentOperation $vm.Name -PercentComplete (Get-Percentage -Count $count -Total 20)
-                $vCloudTaskStatus = Invoke-vCloudDirectorWebRequest -Headers $headers -Method Get -Uri $vCloudTask.Task.href -Verbose:$false
-                Start-Sleep -Seconds 6
-                $count++
-
-            } Until ($vCloudTaskStatus.Task.status -eq 'success' -or $count -eq 20)
-
-            if ($vCloudTaskStatus.Task.status -ne 'success') {
-                throw "Failed to update VDC Computer Policy for '$($vm.Name)' to '$($ComputePolicy.name)'."
-            }
+            #Wait for the task to complete.
+            Wait-vCloudDirectorTask -Task $vCloudTask -Headers $headers -TaskDescription 'Updating VM Compute Policy'
         }
     }
 }
