@@ -7,7 +7,7 @@
     "windows": {
         "options": {
             "shell": {
-                "executable": "powershell.exe",
+                "executable": "C:\\Program Files\\PowerShell\\7-preview\\pwsh.exe",
                 "args": [ "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command" ]
             }
         }
