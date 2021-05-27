@@ -39,10 +39,17 @@ Function Wait-vCloudDirectorTask {
         Start-Sleep -Seconds 6
         $loopIteration++
 
-    } Until ($taskStatus.Task.status -eq 'success' -or $loopIteration -eq $maxLoopIterations)
+    #Exit the loop if the task status changes to 'success' or 'error', or if the maximum loop iteration is reached.
+    } Until (@('success', 'error') -contains $taskStatus.Task.status -or $loopIteration -eq $maxLoopIterations)
 
-    #If the task still hasn't completed after the alotted time then terminate.
-    if ($taskStatus.Task.status -ne 'success') {
-        Write-Error "vCloud Director Task failed to complete in the alotted time. Operation: '$($Task.Task.operation)'"
+    switch ($taskStatus.Task.status) {
+        #If the task completed successfully.
+        'success' {Write-Debug -Message "vCloud Director Task completed successfully. Operation: '$($Task.Task.operation)'"}
+
+        #If the task failed.
+        'error'   {Write-Error "vCloud Director Task failed. Operation: '$($Task.Task.operation)'. `n`rError Message:$($taskStatus.Task.Details)"}
+
+        #If the task still hasn't completed after the alotted time.
+        'queued'  {Write-Error "vCloud Director Task failed to complete in the alotted time. Operation: '$($Task.Task.operation)'"}
     }
 }
