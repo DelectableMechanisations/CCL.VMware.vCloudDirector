@@ -9,9 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
-- Wait-vCloudDirectorTask - Change error type to stop pipeline execution fail
-- Scaffolding (psakeFile.ps1, requirements.psd1, CCL.VMware.vCloudDirector.psm1) - Updated from Stucco version 0.4.0
-
+- Wait-vCloudDirectorTask - Change error type to stop pipeline execution failing.
+- Wait-vCloudDirectorTask - Added logic to take different actions based on the vCloud Director task status. Updated loop to allow early exit if failure detected.
+- psakeFile.ps1, requirements.psd1, CCL.VMware.vCloudDirector.psm1 - Update scaffolding scripts to Stucco version 0.4.0
 
 ## [1.0.0] - 2021-04-06
 
