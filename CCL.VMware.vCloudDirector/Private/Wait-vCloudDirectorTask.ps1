@@ -43,6 +43,6 @@ Function Wait-vCloudDirectorTask {
 
     #If the task still hasn't completed after the alotted time then terminate.
     if ($taskStatus.Task.status -ne 'success') {
-        throw "vCloud Director Task failed to complete in the alotted time. Operation: '$($Task.Task.operation)'"
+        Write-Error "vCloud Director Task failed to complete in the alotted time. Operation: '$($Task.Task.operation)'"
     }
 }
